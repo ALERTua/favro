@@ -4,11 +4,14 @@
 
 
 class User(object):
-    def __init__(self, json):
+    def __init__(self, json, requester):
+        self.__requester = requester
         self.userId = json.get('userId', None)
         self.role = json.get('organizationRole', None)
         self.name = json.get('name', None)
         self.email = json.get('email', None)
+
+        self._json = json
 
     def __eq__(self, other):
         return self.userId == other.userId

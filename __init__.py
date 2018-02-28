@@ -2,25 +2,27 @@
 # -*- coding: utf-8 -*-
 # The above encoding declaration is required and the file must be saved as UTF-8
 from services.requester import Requester
-from services.collection import CollectionService
-from services.widget import WidgetService
-from services.tasklist import TaskListService
-from services.task import TaskService
-from services.column import ColumnService
-from services.tag import TagService
-from services.card import CardService
-from services.user import UserService
+from services.cards import CardService
+from services.collections import CollectionService
+from services.columns import ColumnService
+from services.organizations import OrganizationService
+from services.tags import TagService
+from services.tasks import TaskService
+from services.tasklists import TaskListService
+from services.users import UserService
+from services.widgets import WidgetService
 
 
 class Favro(object):
     def __init__(self, username, token, organizationId):
         self.requester = Requester(username, token, organizationId)
 
-        self.card = CardService(self.requester)
-        self.collection = CollectionService(self.requester)
-        self.column = ColumnService(self.requester)
-        self.tag = TagService(self.requester)
-        self.task = TaskService(self.requester)
-        self.taskList = TaskListService(self.requester)
-        self.user = UserService(self.requester)
-        self.widget = WidgetService(self.requester)
+        self.cards = CardService(self.requester)
+        self.collections = CollectionService(self.requester)
+        self.columns = ColumnService(self.requester)
+        self.organizations = OrganizationService(self.requester)
+        self.tags = TagService(self.requester)
+        self.tasks = TaskService(self.requester)
+        self.taskLists = TaskListService(self.requester)
+        self.users = UserService(self.requester)
+        self.widgets = WidgetService(self.requester)

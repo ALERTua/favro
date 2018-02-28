@@ -1,11 +1,13 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # The above encoding declaration is required and the file must be saved as UTF-8
+from ..entities.tasklist import TaskList
+from ..entities.task import Task
 
 
 class Card(object):
     def __init__(self, json, requester):
-        self.requester = requester
+        self.__requester = requester
 
         from .user import User
 
@@ -54,9 +56,11 @@ class Card(object):
             self.customFields.append(customField)
             # todo: Card.CustomField()
 
+        self._json = json
+
     @property
     def tagNames(self):
-        all_tags = self.requester.getTagsDict()
+        all_tags = self.__requester.getTagsDict()
         tag_names = [name for name, _id in all_tags.iteritems() if _id in self.tagsIds]
         return tag_names
 
@@ -67,7 +71,7 @@ class Card(object):
         return hash(self.cardCommonId)
 
     def addComment(self, comment):
-        return self.requester.addComment(self.cardCommonId, comment)
+        return self.__requester.addComment(self.cardCommonId, comment)
 
     def rename(self, new_name):
         return self.update(name=new_name)
@@ -77,7 +81,7 @@ class Card(object):
                            dragMode='move')
 
     def removeAllTags(self):
-        return self.requester.updateCard(self.cardId, removeTagIds=self.tagsIds)
+        return self.__requester.updateCard(self.cardId, removeTagIds=self.tagsIds)
 
     def update(self, name=None, detailedDescription=None, widgetCommonId=None,
                laneId=None, column_or_Id=None, parentCardId=None, dragMode=None, position=None,
@@ -161,15 +165,15 @@ class Card(object):
         if customFields is not None:
             data['customFields'] = customFields
 
-        cardJson = self.requester.updateCard(self.cardId, data)
-        card = Card(cardJson, self.requester)
+        cardJson = self.__requester.updateCard(self.cardId, data)
+        card = Card(cardJson, self.__requester)
         return card
 
     def delete(self, everywhere=False):
         """
         :rtype: list
         """
-        cardJson = self.requester.updateCard(self.cardId, everywhere)
+        cardJson = self.__requester.updateCard(self.cardId, everywhere)
         deleted_card_ids = list(cardJson)
         return deleted_card_ids
 
@@ -177,7 +181,7 @@ class Card(object):
         if not isinstance(tags, list):
             raise Exception("addTagsByName: tags must be a list, not a %s" % type(tags))
 
-        all_tags = self.requester.getTagsDict()
+        all_tags = self.__requester.getTagsDict()
         addTagIds = [all_tags.get(tag, None) for tag in tags if tag not in self.tagNames]
         if len(addTagIds) == 1:
             addTagIds.append(addTagIds[0])
@@ -192,3 +196,35 @@ class Card(object):
 
         if len(addTagIds) > 0:
             self.update(addTagIds=addTagIds, removeTagIds=removeTagIds)
+
+    def getTaskLists(self):
+        taskListsJson = self.__requester.getTaskLists(self.cardCommonId)
+        taskLists = []
+        for taskListJson in taskListsJson.get('entities', {}):
+            tasklist = TaskList(taskListJson, self.__requester)
+            taskLists.append(tasklist)
+
+        return list(set(taskLists))
+
+    def createTaskList(self, name, position=None, tasks=None):
+        """
+
+        :param name: string name
+        :param position: int position
+        :param tasks: https://favro.com/developer/#create-a-task-list List of Task dicts, containing 'name' string and 'completed' boolean
+        :return: TaskList
+        """
+        taskListJson = self.__requester.createTaskList(self.cardId, name, position, tasks)
+        taskList = TaskList(taskListJson, self.__requester)
+        return taskList
+
+    def getTasks(self, taskList_or_Id=None):
+        tasklistId = taskList_or_Id
+        if isinstance(taskList_or_Id, TaskList):
+            tasklistId = taskList_or_Id.taskListId
+
+        tasksJson = self.__requester.getTasks(self.cardCommonId, tasklistId)
+        tasks = []
+        for taskJson in tasksJson['entities']:
+            tasks.append(Task(taskJson, self.__requester))
+        return tasks

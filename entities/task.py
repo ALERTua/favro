@@ -5,7 +5,7 @@
 
 class Task(object):
     def __init__(self, json, requester):
-        self.requester = requester
+        self.__requester = requester
         self.taskId = json.get('taskId', None)
         self.taskListId = json.get('taskListId', None)
         self.cardCommonId = json.get('cardCommonId', None)
@@ -14,6 +14,8 @@ class Task(object):
         self.completed = json.get('completed', None)
         self.position = json.get('position', None)
 
+        self._json = json
+
     def __eq__(self, other):
         return self.taskId == other.taskId
 
@@ -21,9 +23,9 @@ class Task(object):
         return hash(self.taskId)
 
     def update(self, name=None, position=None, completed=None):
-        taskJson = self.requester.updateTask(self.taskId, name, position, completed)
-        task = Task(taskJson, self.requester)
+        taskJson = self.__requester.updateTask(self.taskId, name, position, completed)
+        task = Task(taskJson, self.__requester)
         return task
 
     def deleteTask(self):
-        return self.requester.deleteTask(self.taskId)
+        return self.__requester.deleteTask(self.taskId)

@@ -6,16 +6,13 @@ from ..entities.card import Card
 
 class CardService(object):
     def __init__(self, requester):
-        self.requester = requester
+        self.__requester = requester
 
     def _getCardsByFilter(self, filters, unique=False, todoListOnly=False):
-        """
-        :rtype: list
-        """
-        cardsJson = self.requester.getCardsByFilters(filters, unique, todoListOnly)
+        cardsJson = self.__requester.getCardsByFilters(filters, unique, todoListOnly)
         cards = []
         for cardJson in cardsJson['entities']:
-            cards.append(Card(cardJson, self.requester))
+            cards.append(Card(cardJson, self.__requester))
         return cards
 
     def getCardsByCardCommonId(self, cardCommonId, unique=False, todoListOnly=False):
@@ -26,30 +23,6 @@ class CardService(object):
         filters = {'cardSequentialId': cardSequentialId}
         return self._getCardsByFilter(filters, unique, todoListOnly)
 
-    def getCardsByWidget(self, widget_or_Id, unique=False, todoListOnly=False):
-        from .widget import Widget
-        widgetCommonId = widget_or_Id
-        if isinstance(widget_or_Id, Widget):
-            widgetCommonId = widget_or_Id.widgetCommonId
-        filters = {'widgetCommonId': widgetCommonId}
-        return self._getCardsByFilter(filters, unique, todoListOnly)
-
-    def getCardsByColumn(self, column_or_Id, unique=False, todoListOnly=False):
-        from .column import Column
-        columnId = column_or_Id
-        if isinstance(column_or_Id, Column):
-            columnId = column_or_Id.columnId
-        filters = {'columnId': columnId}
-        return self._getCardsByFilter(filters, unique, todoListOnly)
-
-    def getCardsByCollection(self, collection_or_Id, unique=False, todoListOnly=False):
-        from .collection import Collection
-        collectionId = collection_or_Id
-        if isinstance(collection_or_Id, Collection):
-            collectionId = collection_or_Id.collectionId
-        filters = {'collectionId': collectionId}
-        return self._getCardsByFilter(filters, unique, todoListOnly)
-
     def getCard(self, card_or_Id):
         """
         :rtype: Card
@@ -57,8 +30,8 @@ class CardService(object):
         cardId = card_or_Id
         if isinstance(card_or_Id, Card):
             cardId = card_or_Id.cardId
-        cardJson = self.requester.getCard(cardId)
-        card = Card(cardJson, self.requester)
+        cardJson = self.__requester.getCard(cardId)
+        card = Card(cardJson, self.__requester)
         return card
 
     def createCard(self, name, widgetCommonId=None, laneId=None, columnId=None, parentCard_or_CardId=None,
@@ -164,6 +137,6 @@ class CardService(object):
         if customFields is not None:
             data['customFields'] = customFields
 
-        cardJson = self.requester.createCard(**data)
-        card = Card(cardJson, self.requester)
+        cardJson = self.__requester.createCard(**data)
+        card = Card(cardJson, self.__requester)
         return card

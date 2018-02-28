@@ -6,11 +6,13 @@
 class Tag(object):
     # https://favro.com/developer/#tags
     def __init__(self, json, requester):
-        self.requester = requester
+        self.__requester = requester
         self.tagId = json.get('tagId', None)
         self.organizationId = json.get('organizationId', None)
         self.name = json.get('name', None)
         self.color = TagColor.createFromString(json.get('color'))
+
+        self._json = json
 
     def __eq__(self, other):
         return self.tagId == other.tagId
@@ -22,12 +24,12 @@ class Tag(object):
         if color is not None:
             color = TagColor.createFromString(color)
 
-        tagJson = self.requester.updateTag(self.tagId, name, color)
-        tag = Tag(tagJson, self.requester)
+        tagJson = self.__requester.updateTag(self.tagId, name, color)
+        tag = Tag(tagJson, self.__requester)
         return tag
 
     def delete(self):
-        return self.requester.deleteTag(self.tagId)
+        return self.__requester.deleteTag(self.tagId)
 
 
 class TagColor(object):

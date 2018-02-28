@@ -96,6 +96,10 @@ class Requester(object):
 
 # + Collections
     def getCollections(self):
+        """
+
+        :rtype:
+        """
         return self._get('collections')
 
     def getCollection(self, collectionId):
@@ -123,8 +127,10 @@ class Requester(object):
     def getColumn(self, columnId):
         return self._get('columns/' + columnId)
 
-    def createColumn(self, widgetCommonId, name):
+    def createColumn(self, widgetCommonId, name, position=None):
         data = {'widgetCommonId': widgetCommonId, 'name': name}
+        if position is not None:
+            data['position'] = position
         return self._post('columns', data=data)
 
     def updateColumn(self, columnId, new_name=None, new_position=None):
@@ -254,6 +260,7 @@ class Requester(object):
         return self._get('tasklists/' + taskListId)
 
     def createTaskList(self, cardCommonId, name, position=None, tasks=None):
+        # type: (str, str, int, list) -> object
         data = {'cardCommonId': cardCommonId, 'name': name}
         if position is not None:
             data['position'] = position
