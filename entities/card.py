@@ -214,7 +214,7 @@ class Card(object):
         :param tasks: https://favro.com/developer/#create-a-task-list List of Task dicts, containing 'name' string and 'completed' boolean
         :return: TaskList
         """
-        taskListJson = self.__requester.createTaskList(self.cardId, name, position, tasks)
+        taskListJson = self.__requester.createTaskList(self.cardCommonId, name, position, tasks)
         taskList = TaskList(taskListJson, self.__requester)
         return taskList
 
