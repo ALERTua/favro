@@ -1,0 +1,169 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+# The above encoding declaration is required and the file must be saved as UTF-8
+from ..entities.card import Card
+
+
+class CardService(object):
+    def __init__(self, requester):
+        self.requester = requester
+
+    def _getCardsByFilter(self, filters, unique=False, todoListOnly=False):
+        """
+        :rtype: list
+        """
+        cardsJson = self.requester.getCardsByFilters(filters, unique, todoListOnly)
+        cards = []
+        for cardJson in cardsJson['entities']:
+            cards.append(Card(cardJson, self.requester))
+        return cards
+
+    def getCardsByCardCommonId(self, cardCommonId, unique=False, todoListOnly=False):
+        filters = {'cardCommonId': cardCommonId}
+        return self._getCardsByFilter(filters, unique, todoListOnly)
+
+    def getCardsByCardSequentialId(self, cardSequentialId, unique=False, todoListOnly=False):
+        filters = {'cardSequentialId': cardSequentialId}
+        return self._getCardsByFilter(filters, unique, todoListOnly)
+
+    def getCardsByWidget(self, widget_or_Id, unique=False, todoListOnly=False):
+        from .widget import Widget
+        widgetCommonId = widget_or_Id
+        if isinstance(widget_or_Id, Widget):
+            widgetCommonId = widget_or_Id.widgetCommonId
+        filters = {'widgetCommonId': widgetCommonId}
+        return self._getCardsByFilter(filters, unique, todoListOnly)
+
+    def getCardsByColumn(self, column_or_Id, unique=False, todoListOnly=False):
+        from .column import Column
+        columnId = column_or_Id
+        if isinstance(column_or_Id, Column):
+            columnId = column_or_Id.columnId
+        filters = {'columnId': columnId}
+        return self._getCardsByFilter(filters, unique, todoListOnly)
+
+    def getCardsByCollection(self, collection_or_Id, unique=False, todoListOnly=False):
+        from .collection import Collection
+        collectionId = collection_or_Id
+        if isinstance(collection_or_Id, Collection):
+            collectionId = collection_or_Id.collectionId
+        filters = {'collectionId': collectionId}
+        return self._getCardsByFilter(filters, unique, todoListOnly)
+
+    def getCard(self, card_or_Id):
+        """
+        :rtype: Card
+        """
+        cardId = card_or_Id
+        if isinstance(card_or_Id, Card):
+            cardId = card_or_Id.cardId
+        cardJson = self.requester.getCard(cardId)
+        card = Card(cardJson, self.requester)
+        return card
+
+    def createCard(self, name, widgetCommonId=None, laneId=None, columnId=None, parentCard_or_CardId=None,
+                   detailedDescription=None, position=None, assignmentIds=None, tagsNamesList=None, tagIdsList=None,
+                   startDate=None, dueDate=None, tasklistsList=None, customFields=None):
+        """
+        https://favro.com/developer/#create-a-card
+
+        :param name: The name of the card. Required.
+        :type name: str
+
+        :param widgetCommonId: The widgetCommonId to create the card on. If not set, the card will be created in the user’s to do list.
+        :type widgetCommonId: str
+
+        :param laneId: The laneId to create the card in. This is only applicable if creating the card on a widget that has lanes enabled. Optional.
+        :type laneId: str
+
+        :param columnId: The columnId to create the card in. It must belong to the widget specified in the widgetCommonId parameter. WidgetCommonId is required if this parameter is set.
+        :type columnId: str
+
+        :param parentCard_or_CardId: If creating a card on a backlog widget, it is possible to create this card as a child of the card specified by this parameter. Optional.
+
+        :param detailedDescription: The detailed description of the card. Supports formatting.
+        :type detailedDescription: str
+
+        :param position: Position of the card in the list.
+        :type position: int
+
+        :param assignmentIds: The list of assignments (array of userIds). Optional.
+        :type assignmentIds: list
+
+        :param tagsNamesList: The list of tag names or card tags that will be added to card. If current tag is not exist in the organization, it will be created.
+        :type tagsNamesList: list
+
+        :param tagIdsList: The list of tag IDs, that will be added to card.
+        :type tagIdsList: list
+
+        :param startDate: The start date of card. Format ISO-8601.
+        :type startDate: str
+
+        :param dueDate: The due date of card. Format ISO-8601.
+        :type dueDate: str
+
+        :param tasklistsList: The list of card tasklists.
+        :type tasklistsList: list
+
+        :param customFields: The list of card custom field parameters.
+        :type customFields: dict
+
+        :return:
+        :rtype: Card
+        """
+        data = {'name': name}
+
+        if widgetCommonId is not None:
+            data['widgetCommonId'] = widgetCommonId
+
+        if laneId is not None:
+            data['laneId'] = laneId
+
+        if columnId is not None:
+            if not widgetCommonId:
+                raise Exception("createCard: columnId can be specified only with widgetCommonId")
+            data['columnId'] = columnId
+
+        if parentCard_or_CardId is not None:
+            parentCardId = parentCard_or_CardId
+            if isinstance(parentCard_or_CardId, Card):
+                parentCardId = parentCard_or_CardId.cardId
+
+            data['parentCardId'] = parentCardId
+
+        if detailedDescription is not None:
+            # *italic*, **bold**, ```code block```, [Link](“http://localhost”)
+            data['detailedDescription'] = detailedDescription
+
+        if position is not None:
+            data['position'] = position
+
+        if assignmentIds is not None:
+            data['assignmentIds'] = assignmentIds
+
+        if tagsNamesList is not None:
+            data['tags'] = tagsNamesList
+
+        if tagIdsList is not None:
+            data['tagIds'] = tagIdsList
+
+        if startDate is not None:
+            # todo: Format ISO-8601
+            data['startDate'] = startDate
+
+        if dueDate is not None:
+            # todo: Format ISO-8601
+            data['dueDate'] = dueDate
+
+        if tasklistsList is not None:
+            data['tasklists'] = tasklistsList
+            # for task in tasklistsList:
+            #    if not isinstance(task, TaskList):
+            #        raise Exception("createCard: tasklistsList must contain only TaskList objects")
+
+        if customFields is not None:
+            data['customFields'] = customFields
+
+        cardJson = self.requester.createCard(**data)
+        card = Card(cardJson, self.requester)
+        return card
