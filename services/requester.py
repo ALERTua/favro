@@ -111,8 +111,8 @@ class Requester(object):
 
 # + Widgets
     def getWidgets(self, collectionId):
-        data = {'collectionId': collectionId}
-        return self._get('widgets', data=data)
+        params = {'collectionId': collectionId}
+        return self._get('widgets', params=params)
 
     def getWidget(self, widgetCommonId):
         return self._get('widgets/' + widgetCommonId)

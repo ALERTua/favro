@@ -8,16 +8,12 @@ class CollectionService(object):
     def __init__(self, requester):
         self.__requester = requester
 
-    def __getCollectionIdFromName(self, collection_name):
-        collectionsJson = self.__requester.getCollections()
-        for collectionJson in collectionsJson['entities']:
-            collection = Collection(collectionJson, self.__requester)
-            if collection_name in collection.name:
-                return collection.collectionId
-
     def getCollectionByName(self, name):
-        collectionId = self.__getCollectionIdFromName(name)
-        return self.getCollection(collectionId)
+        collections = self.getCollections()
+        for collection in collections:
+            if collection.name == name:
+                return collection
+        raise Exception("There's no such collection as %s" % name)
 
     def getCollection(self, collectionId):
         collectionJson = self.__requester.getCollection(collectionId)
@@ -30,5 +26,3 @@ class CollectionService(object):
         for collectionJson in collectionsJson['entities']:
             collections.append(Collection(collectionJson, self.__requester))
         return collections
-
-
