@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # The above encoding declaration is required and the file must be saved as UTF-8
-from ..entities.task import Task
+from .task import Task
 
 
 class TaskList(object):

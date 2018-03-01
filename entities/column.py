@@ -1,7 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # The above encoding declaration is required and the file must be saved as UTF-8
-from .card import Card
 
 
 class Column(object):
@@ -27,6 +26,7 @@ class Column(object):
         return column
 
     def getCards(self, unique=False, todoListOnly=False):
+        from .card import Card
         filters = {'columnId': self.columnId}
         cardsJson = self.__requester.getCardsByFilters(filters, unique, todoListOnly)
         cards = []

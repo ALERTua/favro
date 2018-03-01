@@ -62,6 +62,9 @@ class Requester(object):
                                                                             r.status_code, output.get('message', ''),
                                                                             r.request.url))
 
+        if method == 'delete':
+            return output
+
         page = output.get('page', 0)
         pages = output.get('pages', 0)
         requestId = r.headers.get('X-Favro-Backend-Identifier', None)

@@ -1,8 +1,9 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # The above encoding declaration is required and the file must be saved as UTF-8
-from ..entities.tasklist import TaskList
-from ..entities.task import Task
+from .tasklist import TaskList
+from .task import Task
+from .column import Column
 
 
 class Card(object):
@@ -77,8 +78,21 @@ class Card(object):
         return self.update(name=new_name)
 
     def move(self, column_or_Id):
+        _columnId = column_or_Id
+        if isinstance(column_or_Id, Column):
+            _columnId = column_or_Id.columnId
+        if self.columnId == _columnId:
+            return self
+
         return self.update(widgetCommonId=self.widgetCommonId, column_or_Id=column_or_Id,
                            dragMode='move')
+
+    def copy(self, column_or_Id, widgetCommonId=None):
+        _widgetCommonId = self.widgetCommonId
+        if widgetCommonId is not None:
+            _widgetCommonId = widgetCommonId
+        return self.update(widgetCommonId=_widgetCommonId, column_or_Id=column_or_Id,
+                           dragMode='commit')
 
     def removeAllTags(self):
         return self.__requester.updateCard(self.cardId, removeTagIds=self.tagsIds)
@@ -173,7 +187,7 @@ class Card(object):
         """
         :rtype: list
         """
-        cardJson = self.__requester.updateCard(self.cardId, everywhere)
+        cardJson = self.__requester.deleteCard(self.cardId, everywhere)
         deleted_card_ids = list(cardJson)
         return deleted_card_ids
 
