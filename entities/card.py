@@ -77,6 +77,9 @@ class Card(object):
     def rename(self, new_name):
         return self.update(name=new_name)
 
+    def modify_description(self, new_description):
+        return self.update(detailedDescription=new_description)
+
     def move(self, column_or_Id):
         _columnId = column_or_Id
         if isinstance(column_or_Id, Column):
