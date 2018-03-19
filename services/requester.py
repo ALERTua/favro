@@ -29,26 +29,22 @@ class Requester(object):
 
     def _request(self, method, url, **kwargs):
         url = self.favroBaseUrl + url
-        kwargs.update({'auth': self.authHeader, 'headers': self.organization})
+        kwargs.update({'auth': self.authHeader})
+        if 'headers' in kwargs and isinstance(kwargs['headers'], dict):
+            kwargs['headers'].update(self.organization)
+        else:
+            kwargs.update({'headers': self.organization})
 
         methods = {'get': self.requests.get,
                    'post': self.requests.post,
                    'put': self.requests.put,
                    'delete': self.requests.delete}
 
-        # import json as js
-        # data = None
-        # if 'data' in kwargs:
-        #     data = js.dumps(kwargs['data'])
-        #     kwargs.pop('data', None)
-        #
-        # r = methods[method](url, json=data, **kwargs)
         r = methods[method](url, **kwargs)
 
-        rateLimitRemaining = int(r.headers.get('X-RateLimit-Remaining', 100))
-        rateLimit = int(r.headers.get('X-RateLimit-Limit', 100))
+        rateLimitRemaining = int(r.headers.get('X-RateLimit-Remaining', 666))
+        rateLimit = int(r.headers.get('X-RateLimit-Limit', 666))
         rateLimitReset = r.headers.get('X-RateLimit-Reset', None)
-        output = r.json()
 
         if r.status_code == 429:
             raise Exception("[%s] Rate limit exceeded: %s/%s until %s" % (r.status_code, rateLimitRemaining,
@@ -59,9 +55,11 @@ class Requester(object):
 
         if not r.ok:
             raise Exception("(%s/%s) Request returned code %s: %s in %s" % (rateLimitRemaining, rateLimit,
-                                                                            r.status_code, output.get('message', ''),
+                                                                            r.status_code,
+                                                                            str(r.content) + str(r.reason),
                                                                             r.request.url))
 
+        output = r.json()
         if method == 'delete':
             return output
 
@@ -83,7 +81,7 @@ class Requester(object):
 
         return output
 
-# + Organizations
+    # + Organizations
     def getOrganizations(self):
         if self.organizations is None:
             r = self.requests.get(self.favroBaseUrl + 'organizations', auth=self.authHeader)
@@ -95,9 +93,10 @@ class Requester(object):
                 self.organizations.append(organizationJson)
 
         return self.organizations
-# - Organizations
 
-# + Collections
+    # - Organizations
+
+    # + Collections
     def getCollections(self):
         """
 
@@ -107,9 +106,10 @@ class Requester(object):
 
     def getCollection(self, collectionId):
         return self._get('collections/' + collectionId)
-# - Collections
 
-# + Widgets
+    # - Collections
+
+    # + Widgets
     def getWidgets(self, collectionId):
         params = {'collectionId': collectionId}
         return self._get('widgets', params=params)
@@ -120,9 +120,10 @@ class Requester(object):
     def createWidget(self, widgetName, collectionId):
         data = {'collectionId': collectionId, 'name': widgetName, 'type': 'board'}
         return self._post('widgets', data=data)
-# - Widgets
 
-# + Columns
+    # - Widgets
+
+    # + Columns
     def getColumns(self, widgetCommonId):
         params = {'widgetCommonId': widgetCommonId}
         return self._get('columns', params=params)
@@ -146,9 +147,10 @@ class Requester(object):
             print("updateColumn received no data")
             return
         return self._put('columns/' + columnId, data=data)
-# - Columns
 
-# + Cards
+    # - Columns
+
+    # + Cards
     def getCardsByFilters(self, filters=None, unique=False, todoListOnly=False):
         """
         :type filters: dict
@@ -171,15 +173,16 @@ class Requester(object):
     def createCard(self, **kwargs):
         return self._post('cards', data=kwargs)
 
-    def updateCard(self, cardId, data):
-        return self._put('cards/' + cardId, data=data)
+    def updateCard(self, cardId, data, **kwargs):
+        return self._put('cards/' + cardId, data=data, **kwargs)
 
     def deleteCard(self, cardId, everywhere=False):
         params = {'everywhere': True} if everywhere else None
         return self._delete('cards/' + cardId, params=params)
-# - Cards
 
-# + Tags
+    # - Cards
+
+    # + Tags
     def getTags(self, name=None):
         data = {'name': name} if name is not None else None
         return self._get('tags', data=data)
@@ -220,9 +223,10 @@ class Requester(object):
                 tag = Tag(tagJson, self)
                 self.all_tags[tag.name] = tag.tagId
         return self.all_tags
-# - Tags
 
-# + Tasks
+    # - Tags
+
+    # + Tasks
     def getTasks(self, cardCommonId, taskListId=None):
         params = {'cardCommonId': cardCommonId}
         if taskListId is not None:
@@ -252,9 +256,10 @@ class Requester(object):
 
     def deleteTask(self, taskId):
         return self._delete('tasks/' + taskId)
-# - Tasks
 
-# + TaskLists
+    # - Tasks
+
+    # + TaskLists
     def getTaskLists(self, cardCommonId):
         params = {'cardCommonId': cardCommonId}
         return self._get('tasklists', params=params)
@@ -281,16 +286,18 @@ class Requester(object):
 
     def deleteTaskList(self, taskListId):
         return self._delete('tasklists/' + taskListId)
-# - TaskLists
 
-# + Comments
+    # - TaskLists
+
+    # + Comments
     def addComment(self, cardCommonId, comment):
         data = {'cardCommonId': cardCommonId, 'comment': comment}
         output = self._post('comments', data=data)
         return output
-# - Comments
 
-# + Custom Fields
+    # - Comments
+
+    # + Custom Fields
     def getCustomFields(self):
         return self._get('customfields')
 

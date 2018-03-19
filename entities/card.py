@@ -142,7 +142,7 @@ class Card(object):
                laneId=None, column_or_Id=None, parentCardId=None, dragMode=None, position=None,
                addAssignmentIds=None, removeAssignmentIds=None, addTags=None, addTagIds=None,
                removeTags=None, removeTagIds=None, startDate=None, dueDate=None, addTasklists=None,
-               removeAttachments=None, customFields=None):
+               removeAttachments=None, customFields=None, **kwargs):
         """
         :rtype: Card
         """
@@ -220,7 +220,7 @@ class Card(object):
         if customFields is not None:
             data['customFields'] = customFields
 
-        cardJson = self.__requester.updateCard(self.cardId, data)
+        cardJson = self.__requester.updateCard(self.cardId, data, **kwargs)
         card = Card(cardJson, self.__requester)
         return card
 
