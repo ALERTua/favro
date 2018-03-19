@@ -21,11 +21,19 @@ class Column(object):
         return hash(self.columnId)
 
     def update(self, new_name=None, new_position=None):
+        """
+
+        :rtype: Column
+        """
         columnJson = self.__requester.updateColumn(self.columnId, new_name, new_position)
         column = Column(columnJson, self.__requester)
         return column
 
     def getCards(self, unique=False, todoListOnly=False):
+        """
+
+        :rtype: list of Card
+        """
         from .card import Card
         filters = {'columnId': self.columnId}
         cardsJson = self.__requester.getCardsByFilters(filters, unique, todoListOnly)

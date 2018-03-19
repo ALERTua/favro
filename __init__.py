@@ -5,6 +5,7 @@ from services.requester import Requester
 from services.cards import CardService
 from services.collections import CollectionService
 from services.columns import ColumnService
+from services.customFields import CustomFieldService
 from services.organizations import OrganizationService
 from services.tags import TagService
 from services.tasks import TaskService
@@ -20,6 +21,7 @@ class Favro(object):
         self.cards = CardService(self.requester)
         self.collections = CollectionService(self.requester)
         self.columns = ColumnService(self.requester)
+        self.customFields = CustomFieldService(self.requester)
         self.organizations = OrganizationService(self.requester)
         self.tags = TagService(self.requester)
         self.tasks = TaskService(self.requester)

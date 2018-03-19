@@ -9,6 +9,10 @@ class TagService(object):
         self.__requester = requester
 
     def getTags(self, name=None):
+        """
+
+        :rtype: list of Tag
+        """
         tagsJson = self.__requester.getTags(name)
         tags = []
         for tagJson in tagsJson['entities']:
@@ -19,9 +23,19 @@ class TagService(object):
         return self.getTags(name)
 
     def getTagById(self, tagId):
-        return self.__requester.getTag(tagId)
+        """
+
+        :rtype: Tag
+        """
+        tagJson = self.__requester.getTag(tagId)
+        tag = Tag(tagJson, self.__requester)
+        return tag
 
     def createTag(self, name, color=None):
+        """
+
+        :rtype: Tag
+        """
         if color is not None:
             color = TagColor.createFromString(color)
         tagJson = self.__requester.createTag(name, color)

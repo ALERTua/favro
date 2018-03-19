@@ -9,6 +9,10 @@ class CardService(object):
         self.__requester = requester
 
     def _getCardsByFilter(self, filters, unique=False, todoListOnly=False):
+        """
+
+        :rtype: list of Card
+        """
         cardsJson = self.__requester.getCardsByFilters(filters, unique, todoListOnly)
         cards = []
         for cardJson in cardsJson['entities']:

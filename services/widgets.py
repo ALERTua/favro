@@ -19,6 +19,10 @@ class WidgetService(object):
         return widget
 
     def getWidgetNames(self, widgetsList):
+        """
+
+        :rtype: list of str
+        """
         return [widget.name for widget in widgetsList]
 
     def getWidgetByName(self, name, widgetsList):

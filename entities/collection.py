@@ -26,6 +26,10 @@ class Collection(object):
         return hash(self.collectionId)
 
     def getWidgets(self):
+        """
+
+        :rtype: list of Widget
+        """
         widgetsJson = self.__requester.getWidgets(self.collectionId)
         widgets = []
         for widgetJson in widgetsJson['entities']:
@@ -33,6 +37,10 @@ class Collection(object):
         return widgets
 
     def getCards(self, unique=False, todoListOnly=False):
+        """
+
+        :rtype: list of Card
+        """
         filters = {'collectionId': self.collectionId}
         cardsJson = self.__requester.getCardsByFilters(filters, unique, todoListOnly)
         cards = []

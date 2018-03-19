@@ -9,6 +9,10 @@ class TaskService(object):
         self.__requester = requester
 
     def getTask(self, taskId):
-        taskJson = self.__requester.getTaskBy(taskId)
+        """
+
+        :rtype: Task
+        """
+        taskJson = self.__requester.getTask(taskId)
         task = Task(taskJson, self.__requester)
         return task

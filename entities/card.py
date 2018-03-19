@@ -4,6 +4,7 @@
 from .tasklist import TaskList
 from .task import Task
 from .column import Column
+from .customField import CustomField, CustomFieldType
 
 
 class Card(object):
@@ -14,7 +15,7 @@ class Card(object):
 
         _message = json.get('message', None)
         if _message is not None:
-            raise Exception("Error initiating Card class: %s" % _message)
+            raise Exception("Error initiating %s class: %s" % (self.__name__, _message))
 
         self.cardId = json.get('cardId', None)
         self.organizationId = json.get('organizationId', None)
@@ -41,7 +42,7 @@ class Card(object):
 
         self.assignments = []
         for user in json.get('assignments', []):
-            self.assignments.append(User(user))
+            self.assignments.append(User(user, self.__requester))
 
         self.numComments = json.get('numComments', None)
         self.tasksTotal = json.get('tasksTotal', None)
@@ -52,24 +53,61 @@ class Card(object):
             self.attachments.append(attachment)
             # todo: Attachment()
 
-        self.customFields = []
-        for customField in json.get('customFields', []):
-            self.customFields.append(customField)
-            # todo: Card.CustomField()
+        self.customFieldsValuesDict = {}
+        for customField in json.get('customFields', {}):
+            _id = customField.get('customFieldId', None)
+            _value = customField.get('value', None)
+            self.customFieldsValuesDict[_id] = _value
+
+        self.__customFields = None
 
         self._json = json
-
-    @property
-    def tagNames(self):
-        all_tags = self.__requester.getTagsDict()
-        tag_names = [name for name, _id in all_tags.iteritems() if _id in self.tagsIds]
-        return tag_names
 
     def __eq__(self, other):
         return self.cardCommonId == other.cardCommonId
 
     def __hash__(self):
         return hash(self.cardCommonId)
+
+    @property
+    def customFields(self):
+        """
+
+        :rtype: list of CustomField
+        """
+        if self.__customFields is None:
+            from ..services.customFields import CustomFieldService
+            customFieldService = CustomFieldService(self.__requester)
+            _customFieldsList = []
+            for customFieldId, customFieldValue in self.customFieldsValuesDict.iteritems():
+                _new_customField = customFieldService.getCustomField(customFieldId)
+                if _new_customField in _customFieldsList:
+                    continue
+                _new_customField.value = customFieldValue
+                _customFieldsList.append(_new_customField)
+            self.__customFields = _customFieldsList
+        return self.__customFields
+
+    @property
+    def tagNames(self):
+        """
+
+        :rtype: list of str
+        """
+        all_tags = self.__requester.getTagsDict()
+        tag_names = [name for name, _id in all_tags.iteritems() if _id in self.tagsIds]
+        return tag_names
+
+    def getCustomFieldByFilter(self, customFieldName, customFieldType):
+        # type: (str, CustomFieldType) -> CustomField
+        for customField in self.customFields:
+            if customField.name == customFieldName and customField.type in customFieldType:
+                return customField
+        return None
+
+    def setCustomFieldValue(self, customField, value):
+        _customField_json = {'customFieldId': customField.customFieldId, 'value': value}
+        return self.update(customFields=[_customField_json])
 
     def addComment(self, comment):
         return self.__requester.addComment(self.cardCommonId, comment)
@@ -215,6 +253,10 @@ class Card(object):
             self.update(addTagIds=addTagIds, removeTagIds=removeTagIds)
 
     def getTaskLists(self):
+        """
+
+        :rtype: list of TaskList
+        """
         taskListsJson = self.__requester.getTaskLists(self.cardCommonId)
         taskLists = []
         for taskListJson in taskListsJson.get('entities', {}):
@@ -236,6 +278,10 @@ class Card(object):
         return taskList
 
     def getTasks(self, taskList_or_Id=None):
+        """
+
+        :rtype: list of Task
+        """
         tasklistId = taskList_or_Id
         if isinstance(taskList_or_Id, TaskList):
             tasklistId = taskList_or_Id.taskListId

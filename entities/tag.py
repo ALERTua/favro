@@ -21,6 +21,10 @@ class Tag(object):
         return hash(self.tagId)
 
     def update(self, name=None, color=None):
+        """
+
+        :rtype: Tag
+        """
         if color is not None:
             color = TagColor.createFromString(color)
 

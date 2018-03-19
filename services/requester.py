@@ -289,3 +289,11 @@ class Requester(object):
         output = self._post('comments', data=data)
         return output
 # - Comments
+
+# + Custom Fields
+    def getCustomFields(self):
+        return self._get('customfields')
+
+    def getCustomField(self, customFieldId):
+        return self._get('customfields/' + customFieldId)
+# - Custom Fields

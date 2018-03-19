@@ -10,7 +10,7 @@ class OrganizationService(object):
 
     def getOrganizations(self):
         """
-        :rtype: list
+        :rtype: list of Organization
         """
         organizationsJson = self.__requester.getOrganizations()
         organizations = []
@@ -19,6 +19,9 @@ class OrganizationService(object):
         return organizations
 
     def getOrganizationByName(self, name):
+        """
+        :rtype: Organization
+        """
         organizations = self.getOrganizations()
         for organization in organizations:
             if organization.name == name:
@@ -26,6 +29,9 @@ class OrganizationService(object):
         return None
 
     def getOrganizationById(self, organizationId):
+        """
+        :rtype: Organization
+        """
         organizations = self.getOrganizations()
         for organization in organizations:
             if organization.organizationId == organizationId:

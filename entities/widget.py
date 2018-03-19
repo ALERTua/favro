@@ -22,6 +22,10 @@ class Widget(object):
         return hash(self.widgetCommonId)
 
     def getColumns(self):
+        """
+
+        :rtype: list of Column
+        """
         columnsJson = self.__requester.getColumns(self.widgetCommonId)
         columns = []
         for columnJson in columnsJson['entities']:
@@ -29,6 +33,10 @@ class Widget(object):
         return columns
 
     def getCards(self, unique=False, todoListOnly=False):
+        """
+
+        :rtype: list of Card
+        """
         filters = {'widgetCommonId': self.widgetCommonId}
         cardsJson = self.__requester.getCardsByFilters(filters, unique, todoListOnly)
         cards = []

@@ -10,17 +10,29 @@ class ColumnService(object):
         self.__requester = requester
 
     def getColumn(self, columnId):
+        """
+
+        :rtype: Column
+        """
         columnJson = self.__requester.getColumn(columnId)
         column = Column(columnJson, self.__requester)
         return column
 
     def getColumnByName(self, name, columns):
+        """
+
+        :rtype: Column
+        """
         for column in columns:
             if column.name == name:
                 return column
         return None
 
     def createColumn(self, widget_or_widgetCommonId, column_name, position=None):
+        """
+
+        :rtype: Column
+        """
         widgetCommonId = widget_or_widgetCommonId
         if isinstance(widget_or_widgetCommonId, Widget):
             widgetCommonId = widget_or_widgetCommonId.widgetCommonId

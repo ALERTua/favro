@@ -9,6 +9,10 @@ class CollectionService(object):
         self.__requester = requester
 
     def getCollectionByName(self, name):
+        """
+
+        :rtype: Collection
+        """
         collections = self.getCollections()
         for collection in collections:
             if collection.name == name:
@@ -16,11 +20,19 @@ class CollectionService(object):
         raise Exception("There's no such collection as %s" % name)
 
     def getCollection(self, collectionId):
+        """
+
+        :rtype: Collection
+        """
         collectionJson = self.__requester.getCollection(collectionId)
         collection = Collection(collectionJson, self.__requester)
         return collection
 
     def getCollections(self):
+        """
+
+        :rtype: list of Collection
+        """
         collectionsJson = self.__requester.getCollections()
         collections = []
         for collectionJson in collectionsJson['entities']:
