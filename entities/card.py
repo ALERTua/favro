@@ -106,8 +106,8 @@ class Card(object):
         return None
 
     def setCustomFieldValue(self, customField, value):
-        _customField_json = {'customFieldId': customField.customFieldId, 'value': value}
-        return self.update(customFields=[_customField_json])
+        _customField_json = {'customFields': [{'customFieldId': customField.customFieldId, 'value': value}]}
+        return self.update(json=_customField_json)
 
     def addComment(self, comment):
         return self.__requester.addComment(self.cardCommonId, comment)
