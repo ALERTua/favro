@@ -2,7 +2,25 @@
 # -*- coding: utf-8 -*-
 # The above encoding declaration is required and the file must be saved as UTF-8
 import requests
+import curlify
+from requests.adapters import HTTPAdapter
 from requests.auth import HTTPBasicAuth
+from urllib3.util.retry import Retry
+
+
+def requests_retry_session(retries=5, backoff_factor=0.3, status_forcelist=(500, 502, 504), session=None):
+    session = session or requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
 
 
 class Requester(object):
@@ -29,18 +47,21 @@ class Requester(object):
 
     def _request(self, method, url, **kwargs):
         url = self.favroBaseUrl + url
+
         kwargs.update({'auth': self.authHeader})
         if 'headers' in kwargs and isinstance(kwargs['headers'], dict):
             kwargs['headers'].update(self.organization)
         else:
             kwargs.update({'headers': self.organization})
 
-        methods = {'get': self.requests.get,
-                   'post': self.requests.post,
-                   'put': self.requests.put,
-                   'delete': self.requests.delete}
+        r = requests_retry_session().request(method, url, **kwargs)
 
-        r = methods[method](url, **kwargs)
+        # try:
+        #     r = self.requests.request(method, url, **kwargs)
+        # except Exception as e:
+        #     r = self.requests.request(method, url, **kwargs)
+        #     curl = curlify.to_curl(r.request)
+        #     print("Request Exception: %s\n%s" % (str(e), curl))
 
         rateLimitRemaining = int(r.headers.get('X-RateLimit-Remaining', 666))
         rateLimit = int(r.headers.get('X-RateLimit-Limit', 666))
@@ -67,9 +88,9 @@ class Requester(object):
         pages = output.get('pages', 0)
         requestId = r.headers.get('X-Favro-Backend-Identifier', None)
         while page < pages - 1:
-            params = kwargs.get('params', {})
+            params = kwargs.setdefault('params', {})
             params.update({'requestId': requestId, 'page': page + 1})
-            pagedrequest = methods[method](url, **kwargs)
+            pagedrequest = requests_retry_session().request(method, url, **kwargs)
             pagedrequestjson = pagedrequest.json()
             page = pagedrequestjson.get('page', 0)
             newpages = pagedrequestjson.get('pages', 0)
