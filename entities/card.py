@@ -9,13 +9,13 @@ from .customField import CustomField, CustomFieldType
 
 class Card(object):
     def __init__(self, json, requester):
-        self.__requester = requester
+        self._requester = requester
 
         from .user import User
 
         _message = json.get('message', None)
         if _message is not None:
-            raise Exception("Error initiating %s class: %s" % (self.__name__, _message))
+            raise Exception("Error initiating %s class: %s" % (self.__class__.__name__, _message))
 
         self.cardId = json.get('cardId', None)
         self.organizationId = json.get('organizationId', None)
@@ -42,7 +42,7 @@ class Card(object):
 
         self.assignments = []
         for user in json.get('assignments', []):
-            self.assignments.append(User(user, self.__requester))
+            self.assignments.append(User(user, self._requester))
 
         self.numComments = json.get('numComments', None)
         self.tasksTotal = json.get('tasksTotal', None)
@@ -77,7 +77,7 @@ class Card(object):
         """
         if self.__customFields is None:
             from ..services.customFields import CustomFieldService
-            customFieldService = CustomFieldService(self.__requester)
+            customFieldService = CustomFieldService(self._requester)
             _customFieldsList = []
             for customFieldId, customFieldValue in self.customFieldsValuesDict.iteritems():
                 _new_customField = customFieldService.getCustomField(customFieldId)
@@ -94,12 +94,11 @@ class Card(object):
 
         :rtype: list of str
         """
-        all_tags = self.__requester.getTagsDict()
+        all_tags = self._requester.getTagsDict()
         tag_names = [name for name, _id in all_tags.iteritems() if _id in self.tagsIds]
         return tag_names
 
     def getCustomFieldByFilter(self, customFieldName, customFieldType):
-        # type: (str, CustomFieldType) -> CustomField
         for customField in self.customFields:
             if customField.name == customFieldName and customField.type in customFieldType:
                 return customField
@@ -110,7 +109,7 @@ class Card(object):
         return self.update(json=_customField_json)
 
     def addComment(self, comment):
-        return self.__requester.addComment(self.cardCommonId, comment)
+        return self._requester.addComment(self.cardCommonId, comment)
 
     def rename(self, new_name):
         return self.update(name=new_name)
@@ -136,7 +135,7 @@ class Card(object):
                            dragMode='commit')
 
     def removeAllTags(self):
-        return self.__requester.updateCard(self.cardId, removeTagIds=self.tagsIds)
+        return self._requester.updateCard(self.cardId, removeTagIds=self.tagsIds)
 
     def update(self, name=None, detailedDescription=None, widgetCommonId=None,
                laneId=None, column_or_Id=None, parentCardId=None, dragMode=None, position=None,
@@ -220,15 +219,15 @@ class Card(object):
         if customFields is not None:
             data['customFields'] = customFields
 
-        cardJson = self.__requester.updateCard(self.cardId, data, **kwargs)
-        card = Card(cardJson, self.__requester)
+        cardJson = self._requester.updateCard(self.cardId, data, **kwargs)
+        card = Card(cardJson, self._requester)
         return card
 
     def delete(self, everywhere=False):
         """
         :rtype: list
         """
-        cardJson = self.__requester.deleteCard(self.cardId, everywhere)
+        cardJson = self._requester.deleteCard(self.cardId, everywhere)
         deleted_card_ids = list(cardJson)
         return deleted_card_ids
 
@@ -236,7 +235,7 @@ class Card(object):
         if not isinstance(tags, list):
             raise Exception("addTagsByName: tags must be a list, not a %s" % type(tags))
 
-        all_tags = self.__requester.getTagsDict()
+        all_tags = self._requester.getTagsDict()
         addTagIds = [all_tags.get(tag, None) for tag in tags if tag not in self.tagNames]
         if len(addTagIds) == 1:
             addTagIds.append(addTagIds[0])
@@ -257,10 +256,10 @@ class Card(object):
 
         :rtype: list of TaskList
         """
-        taskListsJson = self.__requester.getTaskLists(self.cardCommonId)
+        taskListsJson = self._requester.getTaskLists(self.cardCommonId)
         taskLists = []
         for taskListJson in taskListsJson.get('entities', {}):
-            tasklist = TaskList(taskListJson, self.__requester)
+            tasklist = TaskList(taskListJson, self._requester)
             taskLists.append(tasklist)
 
         return list(set(taskLists))
@@ -273,8 +272,8 @@ class Card(object):
         :param tasks: https://favro.com/developer/#create-a-task-list List of Task dicts, containing 'name' string and 'completed' boolean
         :return: TaskList
         """
-        taskListJson = self.__requester.createTaskList(self.cardCommonId, name, position, tasks)
-        taskList = TaskList(taskListJson, self.__requester)
+        taskListJson = self._requester.createTaskList(self.cardCommonId, name, position, tasks)
+        taskList = TaskList(taskListJson, self._requester)
         return taskList
 
     def getTasks(self, taskList_or_Id=None):
@@ -286,8 +285,8 @@ class Card(object):
         if isinstance(taskList_or_Id, TaskList):
             tasklistId = taskList_or_Id.taskListId
 
-        tasksJson = self.__requester.getTasks(self.cardCommonId, tasklistId)
+        tasksJson = self._requester.getTasks(self.cardCommonId, tasklistId)
         tasks = []
         for taskJson in tasksJson['entities']:
-            tasks.append(Task(taskJson, self.__requester))
+            tasks.append(Task(taskJson, self._requester))
         return tasks

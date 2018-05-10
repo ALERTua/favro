@@ -119,10 +119,6 @@ class Requester(object):
 
     # + Collections
     def getCollections(self):
-        """
-
-        :rtype:
-        """
         return self._get('collections')
 
     def getCollection(self, collectionId):

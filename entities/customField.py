@@ -9,7 +9,7 @@ class CustomField(object):
 
         _message = json.get('message', None)
         if _message is not None:
-            raise Exception("Error initiating %s class: %s" % (self.__name__, _message))
+            raise Exception("Error initiating %s class: %s" % (self.__class__.__name__, _message))
 
         self.customFieldId = json.get('customFieldId', None)
         self.enabled = json.get('enabled', None)

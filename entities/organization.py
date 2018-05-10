@@ -9,7 +9,7 @@ class Organization(object):
 
         _message = json.get('message', None)
         if _message is not None:
-            raise Exception("Error initiating Organization class: %s" % _message)
+            raise Exception("Error initiating %s class: %s" % (self.__class__.__name__, _message))
 
         self.organizationId = json.get('organizationId', None)
         self.name = json.get('name', None)
