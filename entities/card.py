@@ -124,15 +124,14 @@ class Card(object):
         if self.columnId == _columnId:
             return self
 
-        return self.update(widgetCommonId=self.widgetCommonId, column_or_Id=column_or_Id,
-                           dragMode='move')
+        return self.update(widgetCommonId=self.widgetCommonId, column_or_Id=column_or_Id, dragMode='move')
 
-    def copy(self, column_or_Id, widgetCommonId=None):
+    def copy(self, column_or_Id=None, widgetCommonId=None, parentCardId=None):
         _widgetCommonId = self.widgetCommonId
         if widgetCommonId is not None:
             _widgetCommonId = widgetCommonId
-        return self.update(widgetCommonId=_widgetCommonId, column_or_Id=column_or_Id,
-                           dragMode='commit')
+        output = self.update(widgetCommonId=_widgetCommonId, column_or_Id=column_or_Id, parentCardId=parentCardId, dragMode='commit')
+        return output
 
     def removeAllTags(self):
         return self._requester.updateCard(self.cardId, removeTagIds=self.tagsIds)

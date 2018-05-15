@@ -30,8 +30,7 @@ class WidgetService(object):
 
         :rtype: Widget
         """
-        self.checkWidgetExists(name, widgetsList)
-        return [widget for widget in widgetsList if widget.name == name][0]
+        return next((widget for widget in widgetsList if widget.name == name))
 
     def checkWidgetExists(self, name, widgetsList):
         """

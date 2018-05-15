@@ -8,10 +8,10 @@ from .card import Card
 class Widget(object):
     def __init__(self, json, requester):
         self.__requester = requester
-        self.type = json['type']
-        self.name = json['name']
-        self.color = json['color']
-        self.widgetCommonId = json['widgetCommonId']
+        self.type = json['type']  # type: WidgetType
+        self.name = json['name']  # type: str
+        self.color = json['color']  # type: str
+        self.widgetCommonId = json['widgetCommonId']  # type: str
 
         self._json = json
 
@@ -43,3 +43,17 @@ class Widget(object):
         for cardJson in cardsJson['entities']:
             cards.append(Card(cardJson, self.__requester))
         return cards
+
+
+class WidgetType(object):
+    BACKLOG = 'backlog'
+    BOARD = 'board'
+
+    @classmethod
+    def createFromString(cls, data):
+        types = [cls.BACKLOG, cls.BOARD]
+
+        if data.lower() in types:
+            return data.lower()
+
+        raise Exception("wrong type %s" % data)

@@ -134,8 +134,8 @@ class Requester(object):
     def getWidget(self, widgetCommonId):
         return self._get('widgets/' + widgetCommonId)
 
-    def createWidget(self, widgetName, collectionId):
-        data = {'collectionId': collectionId, 'name': widgetName, 'type': 'board'}
+    def createWidget(self, widgetName, widgetType, collectionId):
+        data = {'collectionId': collectionId, 'name': widgetName, 'type': widgetType}
         return self._post('widgets', data=data)
 
     # - Widgets
