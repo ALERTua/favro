@@ -4,7 +4,6 @@
 from ..services.requester import Requester
 from .widget import Widget, WidgetType
 from .user import User
-from .card import Card
 
 
 class Collection(object):
@@ -42,6 +41,7 @@ class Collection(object):
 
         :rtype: list of Card
         """
+        from .card import Card
         filters = {'collectionId': self.collectionId}
         cardsJson = self.__requester.getCardsByFilters(filters, unique, todoListOnly)
         cards = []

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # The above encoding declaration is required and the file must be saved as UTF-8
 from .column import Column
-from .card import Card
 
 
 class Widget(object):
@@ -24,7 +23,7 @@ class Widget(object):
     def getColumns(self):
         """
 
-        :rtype: list of Column
+        :rtype: list[Column]
         """
         columnsJson = self.__requester.getColumns(self.widgetCommonId)
         columns = []
@@ -37,6 +36,7 @@ class Widget(object):
 
         :rtype: list of Card
         """
+        from .card import Card
         filters = {'widgetCommonId': self.widgetCommonId}
         cardsJson = self.__requester.getCardsByFilters(filters, unique, todoListOnly)
         cards = []

@@ -75,10 +75,11 @@ class Requester(object):
             print("Favro Rate limits: %s/%s" % (rateLimitRemaining, rateLimit))
 
         if not r.ok:
+            curl = curlify.to_curl(r.request)
             raise Exception("(%s/%s) Request returned code %s: %s in %s" % (rateLimitRemaining, rateLimit,
                                                                             r.status_code,
                                                                             str(r.content) + str(r.reason),
-                                                                            r.request.url))
+                                                                            curl))
 
         output = r.json()
         if method == 'delete':

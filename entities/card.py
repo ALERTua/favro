@@ -2,9 +2,6 @@
 # -*- coding: utf-8 -*-
 # The above encoding declaration is required and the file must be saved as UTF-8
 from .tasklist import TaskList
-from .task import Task
-from .column import Column
-from .customField import CustomField, CustomFieldType
 
 
 class Card(object):
@@ -117,14 +114,22 @@ class Card(object):
     def modify_description(self, new_description):
         return self.update(detailedDescription=new_description)
 
-    def move(self, column_or_Id):
-        _columnId = column_or_Id
+    def move(self, column_or_Id=None, widget_or_Id=None, position=None):
+        from .column import Column
+        from .widget import Widget
         if isinstance(column_or_Id, Column):
-            _columnId = column_or_Id.columnId
-        if self.columnId == _columnId:
+            column_or_Id = column_or_Id.columnId
+
+        if self.columnId == column_or_Id and widget_or_Id is None:
             return self
 
-        return self.update(widgetCommonId=self.widgetCommonId, column_or_Id=column_or_Id, dragMode='move')
+        if widget_or_Id is None:
+            widget_or_Id = self.widgetCommonId
+        else:
+            if isinstance(widget_or_Id, Widget):
+                widget_or_Id = widget_or_Id.widgetCommonId
+
+        return self.update(widgetCommonId=widget_or_Id, column_or_Id=column_or_Id, position=position, dragMode='move')
 
     def copy(self, column_or_Id=None, widgetCommonId=None, parentCardId=None):
         _widgetCommonId = self.widgetCommonId
@@ -132,6 +137,25 @@ class Card(object):
             _widgetCommonId = widgetCommonId
         output = self.update(widgetCommonId=_widgetCommonId, column_or_Id=column_or_Id, parentCardId=parentCardId, dragMode='commit')
         return output
+
+    def reposition(self, position):
+        if not isinstance(position, int):
+            raise Exception("card.position accepts only int")
+        if position == self.position:
+            return
+        output = self._requester._put('cards/' + self.cardId, json={'position': position})
+        self.position = position
+        return
+
+    def archive(self, value=True):
+        if value == self.archived:
+            return
+        output = self._requester._put('cards/' + self.cardId, json={'archive': value})
+        self.archived = value
+        return
+
+    def unarchive(self):
+        return self.archive(value=False)
 
     def removeAllTags(self):
         return self._requester.updateCard(self.cardId, removeTagIds=self.tagsIds)
@@ -177,7 +201,7 @@ class Card(object):
             data['dragMode'] = dragMode
 
         if position is not None:
-            data['position'] = position
+            data['position'] = int(position)
 
         if addAssignmentIds is not None:
             data['addAssignmentIds'] = addAssignmentIds
@@ -280,6 +304,7 @@ class Card(object):
 
         :rtype: list of Task
         """
+        from .task import Task
         tasklistId = taskList_or_Id
         if isinstance(taskList_or_Id, TaskList):
             tasklistId = taskList_or_Id.taskListId

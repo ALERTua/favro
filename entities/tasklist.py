@@ -1,7 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # The above encoding declaration is required and the file must be saved as UTF-8
-from .task import Task
 
 
 class TaskList(object):
@@ -32,6 +31,7 @@ class TaskList(object):
 
     def createTask(self, name, position=None, completed=None):
         # type: (str, int, bool) -> Task
+        from .task import Task
         taskJson = self.__requester.createTask(self.taskListId, name, position, completed)
         task = Task(taskJson, self.__requester)
         return task
