@@ -103,6 +103,11 @@ class Card(object):
 
     def setCustomFieldValue(self, customField, value):
         _customField_json = {'customFields': [{'customFieldId': customField.customFieldId, 'value': value}]}
+
+        from .customField import CustomFieldType
+        if customField.type == CustomFieldType.NUMBER:
+            _customField_json = {'customFields': [{'customFieldId': customField.customFieldId, 'total': value}]}
+
         return self.update(json=_customField_json)
 
     def addComment(self, comment):
@@ -139,8 +144,10 @@ class Card(object):
         return output
 
     def reposition(self, position):
-        if not isinstance(position, int):
-            raise Exception("card.position accepts only int")
+        """
+
+        :type position: int
+        """
         if position == self.position:
             return
         output = self._requester._put('cards/' + self.cardId, json={'position': position})
