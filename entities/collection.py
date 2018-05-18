@@ -8,18 +8,20 @@ from .user import User
 
 class Collection(object):
     def __init__(self, json, requester):
-        self.__requester = requester  # type: Requester
+        self._requester = requester  # type: Requester
         self.name = json['name']
         self.collectionId = json['collectionId']
         self.publicSharing = json['publicSharing']
         self.archived = json['archived']
         self.users = []
         for jsonUser in json['sharedToUsers']:
-            self.users.append(User(jsonUser, self.__requester))
+            self.users.append(User(jsonUser, self._requester))
 
         self._json = json
 
     def __eq__(self, other):
+        if not isinstance(other, Collection):
+            return False
         return self.collectionId == other.collectionId
 
     def __hash__(self):
@@ -30,10 +32,10 @@ class Collection(object):
 
         :rtype: list of Widget
         """
-        widgetsJson = self.__requester.getWidgets(self.collectionId)
+        widgetsJson = self._requester.getWidgets(self.collectionId)
         widgets = []
         for widgetJson in widgetsJson['entities']:
-            widgets.append(Widget(widgetJson, self.__requester))
+            widgets.append(Widget(widgetJson, self._requester))
         return widgets
 
     def getCards(self, unique=False, todoListOnly=False):
@@ -43,10 +45,10 @@ class Collection(object):
         """
         from .card import Card
         filters = {'collectionId': self.collectionId}
-        cardsJson = self.__requester.getCardsByFilters(filters, unique, todoListOnly)
+        cardsJson = self._requester.getCardsByFilters(filters, unique, todoListOnly)
         cards = []
         for cardJson in cardsJson['entities']:
-            cards.append(Card(cardJson, self.__requester))
+            cards.append(Card(cardJson, self._requester))
         return cards
 
     def createWidget(self, widgetName, widgetType):
@@ -56,4 +58,4 @@ class Collection(object):
         :type widgetType: WidgetType
         :type widgetName: str
         """
-        return Widget(self.__requester.createWidget(widgetName, widgetType, self.collectionId), self.__requester)
+        return Widget(self._requester.createWidget(widgetName, widgetType, self.collectionId), self._requester)

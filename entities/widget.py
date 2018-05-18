@@ -1,12 +1,13 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # The above encoding declaration is required and the file must be saved as UTF-8
+from ..services.requester import Requester
 from .column import Column
 
 
 class Widget(object):
     def __init__(self, json, requester):
-        self.__requester = requester
+        self._requester = requester  # type: Requester
         self.type = json['type']  # type: WidgetType
         self.name = json['name']  # type: str
         self.color = json['color']  # type: str
@@ -15,6 +16,8 @@ class Widget(object):
         self._json = json
 
     def __eq__(self, other):
+        if not isinstance(other, Widget):
+            return False
         return self.widgetCommonId == other.widgetCommonId
 
     def __hash__(self):
@@ -25,10 +28,10 @@ class Widget(object):
 
         :rtype: list[Column]
         """
-        columnsJson = self.__requester.getColumns(self.widgetCommonId)
+        columnsJson = self._requester.getColumns(self.widgetCommonId)
         columns = []
         for columnJson in columnsJson['entities']:
-            columns.append(Column(columnJson, self.__requester))
+            columns.append(Column(columnJson, self._requester))
         return columns
 
     def getCards(self, unique=False, todoListOnly=False):
@@ -38,10 +41,10 @@ class Widget(object):
         """
         from .card import Card
         filters = {'widgetCommonId': self.widgetCommonId}
-        cardsJson = self.__requester.getCardsByFilters(filters, unique, todoListOnly)
+        cardsJson = self._requester.getCardsByFilters(filters, unique, todoListOnly)
         cards = []
         for cardJson in cardsJson['entities']:
-            cards.append(Card(cardJson, self.__requester))
+            cards.append(Card(cardJson, self._requester))
         return cards
 
 

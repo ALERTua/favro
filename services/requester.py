@@ -189,7 +189,7 @@ class Requester(object):
         return self._get('cards/' + cardId)
 
     def createCard(self, **kwargs):
-        return self._post('cards', data=kwargs)
+        return self._post('cards', json=kwargs)
 
     def updateCard(self, cardId, data, **kwargs):
         return self._put('cards/' + cardId, data=data, **kwargs)

@@ -1,14 +1,13 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # The above encoding declaration is required and the file must be saved as UTF-8
+from ..services.requester import Requester
 from .tasklist import TaskList
 
 
 class Card(object):
     def __init__(self, json, requester):
-        self._requester = requester
-
-        from .user import User
+        self._requester = requester  # type: Requester
 
         _message = json.get('message', None)
         if _message is not None:
@@ -38,6 +37,7 @@ class Card(object):
         self.dueDate = json.get('dueDate', None)
 
         self.assignments = []
+        from .user import User
         for user in json.get('assignments', []):
             self.assignments.append(User(user, self._requester))
 
@@ -61,6 +61,8 @@ class Card(object):
         self._json = json
 
     def __eq__(self, other):
+        if not isinstance(other, Card):
+            return False
         return self.cardCommonId == other.cardCommonId
 
     def __hash__(self):
@@ -152,14 +154,12 @@ class Card(object):
             return
         output = self._requester._put('cards/' + self.cardId, json={'position': position})
         self.position = position
-        return
 
     def archive(self, value=True):
         if value == self.archived:
             return
         output = self._requester._put('cards/' + self.cardId, json={'archive': value})
         self.archived = value
-        return
 
     def unarchive(self):
         return self.archive(value=False)

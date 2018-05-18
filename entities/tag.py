@@ -1,12 +1,13 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # The above encoding declaration is required and the file must be saved as UTF-8
+from ..services.requester import Requester
 
 
 class Tag(object):
     # https://favro.com/developer/#tags
     def __init__(self, json, requester):
-        self.__requester = requester
+        self._requester = requester  # type: Requester
         self.tagId = json.get('tagId', None)
         self.organizationId = json.get('organizationId', None)
         self.name = json.get('name', None)
@@ -15,6 +16,8 @@ class Tag(object):
         self._json = json
 
     def __eq__(self, other):
+        if not isinstance(other, Tag):
+            return False
         return self.tagId == other.tagId
 
     def __hash__(self):
@@ -28,12 +31,12 @@ class Tag(object):
         if color is not None:
             color = TagColor.createFromString(color)
 
-        tagJson = self.__requester.updateTag(self.tagId, name, color)
-        tag = Tag(tagJson, self.__requester)
+        tagJson = self._requester.updateTag(self.tagId, name, color)
+        tag = Tag(tagJson, self._requester)
         return tag
 
     def delete(self):
-        return self.__requester.deleteTag(self.tagId)
+        return self._requester.deleteTag(self.tagId)
 
 
 class TagColor(object):

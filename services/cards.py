@@ -1,22 +1,23 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # The above encoding declaration is required and the file must be saved as UTF-8
+from ..services.requester import Requester
 from ..entities.card import Card
 
 
 class CardService(object):
     def __init__(self, requester):
-        self.__requester = requester
+        self._requester = requester  # type: Requester
 
     def _getCardsByFilter(self, filters, unique=False, todoListOnly=False):
         """
 
         :rtype: list of Card
         """
-        cardsJson = self.__requester.getCardsByFilters(filters, unique, todoListOnly)
+        cardsJson = self._requester.getCardsByFilters(filters, unique, todoListOnly)
         cards = []
         for cardJson in cardsJson['entities']:
-            cards.append(Card(cardJson, self.__requester))
+            cards.append(Card(cardJson, self._requester))
         return cards
 
     def getCardsByCardCommonId(self, cardCommonId, unique=False, todoListOnly=False):
@@ -34,8 +35,8 @@ class CardService(object):
         cardId = card_or_Id
         if isinstance(card_or_Id, Card):
             cardId = card_or_Id.cardId
-        cardJson = self.__requester.getCard(cardId)
-        card = Card(cardJson, self.__requester)
+        cardJson = self._requester.getCard(cardId)
+        card = Card(cardJson, self._requester)
         return card
 
     def createCard(self, name, widgetCommonId=None, laneId=None, columnId=None, parentCard_or_CardId=None,
@@ -88,59 +89,59 @@ class CardService(object):
         :return:
         :rtype: Card
         """
-        data = {'name': name}
+        json = {'name': name}
 
         if widgetCommonId is not None:
-            data['widgetCommonId'] = widgetCommonId
+            json['widgetCommonId'] = widgetCommonId
 
         if laneId is not None:
-            data['laneId'] = laneId
+            json['laneId'] = laneId
 
         if columnId is not None:
             if not widgetCommonId:
                 raise Exception("createCard: columnId can be specified only with widgetCommonId")
-            data['columnId'] = columnId
+            json['columnId'] = columnId
 
         if parentCard_or_CardId is not None:
             parentCardId = parentCard_or_CardId
             if isinstance(parentCard_or_CardId, Card):
                 parentCardId = parentCard_or_CardId.cardId
 
-            data['parentCardId'] = parentCardId
+            json['parentCardId'] = parentCardId
 
         if detailedDescription is not None:
             # *italic*, **bold**, ```code block```, [Link](“http://localhost”)
-            data['detailedDescription'] = detailedDescription
+            json['detailedDescription'] = detailedDescription
 
         if position is not None:
-            data['position'] = position
+            json['position'] = position
 
         if assignmentIds is not None:
-            data['assignmentIds'] = assignmentIds
+            json['assignmentIds'] = assignmentIds
 
         if tagsNamesList is not None:
-            data['tags'] = tagsNamesList
+            json['tags'] = tagsNamesList
 
         if tagIdsList is not None:
-            data['tagIds'] = tagIdsList
+            json['tagIds'] = tagIdsList
 
         if startDate is not None:
             # todo: Format ISO-8601
-            data['startDate'] = startDate
+            json['startDate'] = startDate
 
         if dueDate is not None:
             # todo: Format ISO-8601
-            data['dueDate'] = dueDate
+            json['dueDate'] = dueDate
 
         if tasklistsList is not None:
-            data['tasklists'] = tasklistsList
+            json['tasklists'] = tasklistsList
             # for task in tasklistsList:
             #    if not isinstance(task, TaskList):
             #        raise Exception("createCard: tasklistsList must contain only TaskList objects")
 
         if customFields is not None:
-            data['customFields'] = customFields
+            json['customFields'] = customFields
 
-        cardJson = self.__requester.createCard(**data)
-        card = Card(cardJson, self.__requester)
+        cardJson = self._requester.createCard(**json)
+        card = Card(cardJson, self._requester)
         return card
