@@ -53,7 +53,7 @@ class Card(object):
         self.customFieldsValuesDict = {}
         for customField in json.get('customFields', {}):
             _id = customField.get('customFieldId', None)
-            _value = customField.get('value', None)
+            _value = customField.get('value', None) or customField.get('total', None)
             self.customFieldsValuesDict[_id] = _value
 
         self.__customFields = None
@@ -165,7 +165,7 @@ class Card(object):
         return self.archive(value=False)
 
     def removeAllTags(self):
-        return self._requester.updateCard(self.cardId, removeTagIds=self.tagsIds)
+        return self.update(removeTagIds=self.tagsIds)
 
     def update(self, name=None, detailedDescription=None, widgetCommonId=None,
                laneId=None, column_or_Id=None, parentCardId=None, dragMode=None, position=None,
@@ -261,24 +261,28 @@ class Card(object):
         deleted_card_ids = list(cardJson)
         return deleted_card_ids
 
-    def addTagsByName(self, tags, mode_set=False):
-        if not isinstance(tags, list):
-            raise Exception("addTagsByName: tags must be a list, not a %s" % type(tags))
+    def addTagsByName(self, tags, mode_set=False, all_tags=None):
+        """
 
-        all_tags = self._requester.getTagsDict()
-        addTagIds = [all_tags.get(tag, None) for tag in tags if tag not in self.tagNames]
+        :param all_tags: dict
+        :param mode_set: bool
+        :type tags: list[str]
+        """
+        all_tags = all_tags or self._requester.getTagsDict()
+        tagsIds = [tagId for tagName, tagId in all_tags.items() if tagName in tags]
+        addTagIds = [tagId for tagId in tagsIds if tagId not in self.tagsIds]
         if len(addTagIds) == 1:
             addTagIds.append(addTagIds[0])
             # funny, huh?
 
         removeTagIds = None
         if mode_set is True:
-            removeTagIds = [tagId for tagId in self.tagsIds if tagId not in addTagIds]
+            removeTagIds = [tagId for tagId in self.tagsIds if tagId not in tagsIds]
             if len(removeTagIds) == 1:
                 removeTagIds.append(removeTagIds[0])
                 # funny, huh?
 
-        if len(addTagIds) > 0:
+        if any(addTagIds) or any(removeTagIds):
             self.update(addTagIds=addTagIds, removeTagIds=removeTagIds)
 
     def getTaskLists(self):

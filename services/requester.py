@@ -191,7 +191,7 @@ class Requester(object):
     def createCard(self, **kwargs):
         return self._post('cards', json=kwargs)
 
-    def updateCard(self, cardId, data, **kwargs):
+    def updateCard(self, cardId, data=None, **kwargs):
         return self._put('cards/' + cardId, data=data, **kwargs)
 
     def deleteCard(self, cardId, everywhere=False):
