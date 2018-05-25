@@ -195,8 +195,8 @@ class Requester(object):
         return self._put('cards/' + cardId, data=data, **kwargs)
 
     def deleteCard(self, cardId, everywhere=False):
-        params = {'everywhere': True} if everywhere else None
-        return self._delete('cards/' + cardId, params=params)
+        params = {'everywhere': everywhere} if everywhere is True else None
+        return self._delete('cards/' + cardId, json=params)
 
     # - Cards
 
