@@ -6,14 +6,14 @@ from ..services.requester import Requester
 
 class TaskList(object):
     def __init__(self, json, requester):
+        self._json = json
         self._requester = requester  # type: Requester
+
         self.taskListId = json.get('taskListId', None)
         self.cardCommonId = json.get('cardCommonId', None)
         self.organizationId = json.get('organizationId', None)
         self.name = json.get('name', None)
         self.position = json.get('position', None)
-
-        self._json = json
 
     def __eq__(self, other):
         if not isinstance(other, TaskList):

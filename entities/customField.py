@@ -6,6 +6,7 @@ from ..services.requester import Requester
 
 class CustomField(object):
     def __init__(self, json, requester):
+        self._json = json
         self._requester = requester  # type: Requester
 
         _message = json.get('message', None)
@@ -22,7 +23,6 @@ class CustomField(object):
             self.type = CustomFieldType.createFromString(self.type)
 
         self._types = CustomFieldType()
-        self._json = json
 
     def __eq__(self, other):
         if not isinstance(other, CustomField):

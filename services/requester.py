@@ -128,8 +128,11 @@ class Requester(object):
     # - Collections
 
     # + Widgets
-    def getWidgets(self, collectionId):
+    def getWidgets(self, collectionId, archived=None):
         params = {'collectionId': collectionId}
+        if archived:
+            params['archived'] = str(archived).lower()
+
         return self._get('widgets', params=params)
 
     def getWidget(self, widgetCommonId):
@@ -169,17 +172,18 @@ class Requester(object):
     # - Columns
 
     # + Cards
-    def getCardsByFilters(self, filters=None, unique=False, todoListOnly=False):
+    def getCards(self, filters=None, unique=False, todoListOnly=False, archived=False):
         """
         :type filters: dict
         :type unique: bool
         :type todoListOnly: bool
+        :type archived: bool
         """
-        if filters is None:
-            filters = {}
+        filters = filters or {}
         if unique:
             filters['unique'] = str(unique).lower()
-
+        if archived:
+            filters['archived'] = str(archived).lower()
         if todoListOnly:
             filters['todoList'] = str(todoListOnly).lower()
 
@@ -321,4 +325,4 @@ class Requester(object):
 
     def getCustomField(self, customFieldId):
         return self._get('customfields/' + customFieldId)
-# - Custom Fields
+    # - Custom Fields

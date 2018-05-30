@@ -8,16 +8,20 @@ from .user import User
 
 class Collection(object):
     def __init__(self, json, requester):
-        self._requester = requester  # type: Requester
-        self.name = json['name']
-        self.collectionId = json['collectionId']
-        self.publicSharing = json['publicSharing']
-        self.archived = json['archived']
-        self.users = []
-        for jsonUser in json['sharedToUsers']:
-            self.users.append(User(jsonUser, self._requester))
-
         self._json = json
+        self._requester = requester  # type: Requester
+
+        self.archived = json['archived']
+        self.background = json.get('background', None)
+        self.collectionId = json['collectionId']
+        self.fullMembersCanAddWidgets = json.get('fullMembersCanAddWidgets', None)
+        self.name = json['name']
+        self.organizationId = json['organizationId']
+        self.publicSharing = json.get('publicSharing', None)
+
+        self.sharedToUsers = []
+        for jsonUser in json['sharedToUsers']:
+            self.sharedToUsers.append(User(jsonUser, self._requester))
 
     def __eq__(self, other):
         if not isinstance(other, Collection):
@@ -45,7 +49,7 @@ class Collection(object):
         """
         from .card import Card
         filters = {'collectionId': self.collectionId}
-        cardsJson = self._requester.getCardsByFilters(filters, unique, todoListOnly)
+        cardsJson = self._requester.getCards(filters, unique, todoListOnly)
         cards = []
         for cardJson in cardsJson['entities']:
             cards.append(Card(cardJson, self._requester))

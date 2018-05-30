@@ -7,13 +7,13 @@ from ..services.requester import Requester
 class Tag(object):
     # https://favro.com/developer/#tags
     def __init__(self, json, requester):
+        self._json = json
         self._requester = requester  # type: Requester
+
         self.tagId = json.get('tagId', None)
         self.organizationId = json.get('organizationId', None)
         self.name = json.get('name', None)
         self.color = TagColor.createFromString(json.get('color'))
-
-        self._json = json
 
     def __eq__(self, other):
         if not isinstance(other, Tag):

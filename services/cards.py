@@ -9,24 +9,20 @@ class CardService(object):
     def __init__(self, requester):
         self._requester = requester  # type: Requester
 
-    def _getCardsByFilter(self, filters, unique=False, todoListOnly=False):
+    def getCards(self, filters=None, unique=False, todoListOnly=False, archived=False):
         """
 
+        :type filters: dict
+        :type unique: bool
+        :type todoListOnly: bool
+        :type archived: bool
         :rtype: list of Card
         """
-        cardsJson = self._requester.getCardsByFilters(filters, unique, todoListOnly)
+        cardsJson = self._requester.getCards(filters, unique, todoListOnly, archived)
         cards = []
         for cardJson in cardsJson['entities']:
             cards.append(Card(cardJson, self._requester))
         return cards
-
-    def getCardsByCardCommonId(self, cardCommonId, unique=False, todoListOnly=False):
-        filters = {'cardCommonId': cardCommonId}
-        return self._getCardsByFilter(filters, unique, todoListOnly)
-
-    def getCardsByCardSequentialId(self, cardSequentialId, unique=False, todoListOnly=False):
-        filters = {'cardSequentialId': cardSequentialId}
-        return self._getCardsByFilter(filters, unique, todoListOnly)
 
     def getCard(self, card_or_Id):
         """

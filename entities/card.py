@@ -7,58 +7,57 @@ from .tasklist import TaskList
 
 class Card(object):
     def __init__(self, json, requester):
+        self._json = json
         self._requester = requester  # type: Requester
 
-        _message = json.get('message', None)
+        _message = json.get('message', None)  # type: str
         if _message is not None:
             raise Exception("Error initiating %s class: %s" % (self.__class__.__name__, _message))
 
-        self.cardId = json.get('cardId', None)
-        self.organizationId = json.get('organizationId', None)
-        self.widgetCommonId = json.get('widgetCommonId', None)
-        self.todoListUserId = json.get('todoListUserId', None)
-        self.todoListCompleted = json.get('todoListCompleted', None)
-        self.columnId = json.get('columnId', None)
-        self.laneId = json.get('laneId', None)
-        self.parentCardId = json.get('parentCardId', None)
-        self.isLane = json.get('isLane', None)
-        self.archived = json.get('archived', None)
-        self.position = json.get('position', None)
-        self.cardCommonId = json.get('cardCommonId', None)
-        self.name = json.get('name', None)
-        self.detailedDescription = json.get('detailedDescription', None)
+        self.archived = json.get('archived')  # type: bool
 
-        self.tagsIds = []
-        for tag in json.get('tags', []):
-            self.tagsIds.append(tag)
-
-        self.sequentialId = json.get('sequentialId', None)
-        self.startDate = json.get('startDate', None)
-        self.dueDate = json.get('dueDate', None)
-
-        self.assignments = []
+        self.assignments = []  # type: list
         from .user import User
         for user in json.get('assignments', []):
             self.assignments.append(User(user, self._requester))
 
-        self.numComments = json.get('numComments', None)
-        self.tasksTotal = json.get('tasksTotal', None)
-        self.tasksDone = json.get('tasksDone', None)
-
-        self.attachments = []
+        self.attachments = []  # type: list
         for attachment in json.get('attachments', []):
             self.attachments.append(attachment)
             # todo: Attachment()
 
+        self.cardCommonId = json.get('cardCommonId')  # type: str
+        self.cardId = json.get('cardId')  # type: str
+        self.columnId = json.get('columnId')  # type: str
+
+        self.__customFields = None
         self.customFieldsValuesDict = {}
         for customField in json.get('customFields', {}):
             _id = customField.get('customFieldId', None)
             _value = customField.get('value', None) or customField.get('total', None)
             self.customFieldsValuesDict[_id] = _value
 
-        self.__customFields = None
+        self.detailedDescription = json.get('detailedDescription', None)  # type: str
+        self.dueDate = json.get('dueDate', None)
+        self.isLane = json.get('isLane')  # type: bool
+        self.name = json.get('name')  # type: str
+        self.numComments = json.get('numComments', None)  # type: int
+        self.organizationId = json.get('organizationId')  # type: str
+        self.parentCardId = json.get('parentCardId', None)  # type: str
+        self.position = json.get('position')  # type: float
+        self.sequentialId = json.get('sequentialId', None)  # type: str
 
-        self._json = json
+        self.tagsIds = []
+        for tag in json.get('tags', []):
+            self.tagsIds.append(tag)
+
+        self.tasksTotal = json.get('tasksTotal', None)  # type: int
+        self.tasksDone = json.get('tasksDone', None)  # type: int
+        self.timeOnBoard = json.get('timeOnBoard', None)  # todo: namedtuple?
+        self.timeOnColumns = json.get('timeOnColumns', None)  # todo: namedtuple?
+        self.todoListUserId = json.get('todoListUserId', None)  # type: str
+        self.todoListCompleted = json.get('todoListCompleted', None)  # type: str
+        self.widgetCommonId = json.get('widgetCommonId')  # type: str
 
     def __eq__(self, other):
         if not isinstance(other, Card):

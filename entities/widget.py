@@ -7,13 +7,19 @@ from .column import Column
 
 class Widget(object):
     def __init__(self, json, requester):
-        self._requester = requester  # type: Requester
-        self.type = json['type']  # type: WidgetType
-        self.name = json['name']  # type: str
-        self.color = json['color']  # type: str
-        self.widgetCommonId = json['widgetCommonId']  # type: str
-
         self._json = json
+        self._requester = requester  # type: Requester
+
+        self.archived = json.get('archived')
+        self.collectionIds = json.get('collectionIds', [])
+        self.color = json['color']  # type: str
+        self.breakdownCardCommonId = json.get('breakdownCardCommonId', None)  # type: str
+        self.editRole = json['editRole']  # type: str
+        self.name = json['name']  # type: str
+        self.organizationId = json.get('organizationId')
+        self.ownerRole = json['ownerRole']  # type: str
+        self.type = json['type']  # type: WidgetType
+        self.widgetCommonId = json['widgetCommonId']  # type: str
 
     def __eq__(self, other):
         if not isinstance(other, Widget):
@@ -41,7 +47,7 @@ class Widget(object):
         """
         from .card import Card
         filters = {'widgetCommonId': self.widgetCommonId}
-        cardsJson = self._requester.getCardsByFilters(filters, unique, todoListOnly)
+        cardsJson = self._requester.getCards(filters, unique, todoListOnly)
         cards = []
         for cardJson in cardsJson['entities']:
             cards.append(Card(cardJson, self._requester))

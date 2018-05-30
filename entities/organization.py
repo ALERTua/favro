@@ -6,6 +6,7 @@ from ..services.requester import Requester
 
 class Organization(object):
     def __init__(self, json, requester):
+        self._json = json
         self._requester = requester  # type: Requester
 
         _message = json.get('message', None)
@@ -14,8 +15,6 @@ class Organization(object):
 
         self.organizationId = json.get('organizationId', None)
         self.name = json.get('name', None)
-
-        self._json = json
 
     def __eq__(self, other):
         if not isinstance(other, Organization):

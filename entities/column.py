@@ -6,14 +6,17 @@ from ..services.requester import Requester
 
 class Column(object):
     def __init__(self, json, requester):
-        self._requester = requester  # type: Requester
-        self.columnId = json['columnId']
-        self.organizationId = json['organizationId']
-        self.widgetCommonId = json['widgetCommonId']
-        self.name = json['name']
-        self.position = json['position']
-
         self._json = json
+        self._requester = requester  # type: Requester
+
+        self.cardCount = json['cardCount']  # type: int
+        self.columnId = json['columnId']  # type: str
+        self.estimationSum = json.get('estimationSum', None)  # type: int
+        self.name = json['name']  # type: str
+        self.organizationId = json['organizationId']  # type: str
+        self.position = json['position']  # type: float
+        self.timeSum = json.get('timeSum', None)  # type: int
+        self.widgetCommonId = json['widgetCommonId']  # type: str
 
     def __eq__(self, other):
         if not isinstance(other, Column):
@@ -39,7 +42,7 @@ class Column(object):
         """
         from .card import Card
         filters = {'columnId': self.columnId}
-        cardsJson = self._requester.getCardsByFilters(filters, unique, todoListOnly)
+        cardsJson = self._requester.getCards(filters, unique, todoListOnly)
         cards = []
         for cardJson in cardsJson['entities']:
             cards.append(Card(cardJson, self._requester))

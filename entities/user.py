@@ -6,13 +6,13 @@ from ..services.requester import Requester
 
 class User(object):
     def __init__(self, json, requester):
+        self._json = json
         self._requester = requester  # type: Requester
+
         self.userId = json.get('userId', None)
-        self.role = json.get('organizationRole', None)
+        self.organizationRole = json.get('organizationRole', None)
         self.name = json.get('name', None)
         self.email = json.get('email', None)
-
-        self._json = json
 
     def __eq__(self, other):
         if not isinstance(other, User):
