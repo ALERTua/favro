@@ -26,6 +26,9 @@ class Column(object):
     def __hash__(self):
         return hash(self.columnId)
 
+    def __str__(self):
+        return self.name
+
     def update(self, new_name=None, new_position=None):
         """
 

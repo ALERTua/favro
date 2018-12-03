@@ -23,3 +23,6 @@ class Organization(object):
 
     def __hash__(self):
         return hash(self.organizationId)
+
+    def __str__(self):
+        return self.name

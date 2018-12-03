@@ -23,6 +23,9 @@ class TaskList(object):
     def __hash__(self):
         return hash(self.taskListId)
 
+    def __str__(self):
+        return self.name
+
     def update(self, name=None, position=None):
         # type: (str, int) -> TaskList
         taskListJson = self._requester.updateTaskList(self.taskListId, name, position)

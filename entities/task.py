@@ -25,6 +25,9 @@ class Task(object):
     def __hash__(self):
         return hash(self.taskId)
 
+    def __str__(self):
+        return self.name
+
     def update(self, name=None, position=None, completed=None):
         taskJson = self._requester.updateTask(self.taskId, name, position, completed)
         task = Task(taskJson, self._requester)

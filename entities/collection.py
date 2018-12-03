@@ -31,6 +31,9 @@ class Collection(object):
     def __hash__(self):
         return hash(self.collectionId)
 
+    def __str__(self):
+        return self.name
+
     def getWidgets(self):
         """
 

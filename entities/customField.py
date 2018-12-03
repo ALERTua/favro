@@ -32,6 +32,9 @@ class CustomField(object):
     def __hash__(self):
         return hash(self.customFieldId)
 
+    def __str__(self):
+        return self.name
+
 
 class CustomFieldType(object):
     NUMBER = u'Number'

@@ -67,6 +67,13 @@ class Card(object):
     def __hash__(self):
         return hash(self.cardCommonId)
 
+    def __str__(self):
+        return self.name
+
+    @property
+    def widget_name(self):
+        return self._requester.getWidget(self.widgetCommonId)['name']
+
     @property
     def customFields(self):
         """
@@ -77,7 +84,7 @@ class Card(object):
             from ..services.customFields import CustomFieldService
             customFieldService = CustomFieldService(self._requester)
             _customFieldsList = []
-            for customFieldId, customFieldValue in self.customFieldsValuesDict.iteritems():
+            for customFieldId, customFieldValue in self.customFieldsValuesDict.items():
                 _new_customField = customFieldService.getCustomField(customFieldId)
                 if _new_customField in _customFieldsList:
                     continue
@@ -93,7 +100,7 @@ class Card(object):
         :rtype: list of str
         """
         all_tags = self._requester.getTagsDict()
-        tag_names = [name for name, _id in all_tags.iteritems() if _id in self.tagsIds]
+        tag_names = [name for name, _id in all_tags.items() if _id in self.tagsIds]
         return tag_names
 
     def getCustomFieldByFilter(self, customFieldName, customFieldType):

@@ -32,7 +32,7 @@ class Widget(object):
     def getColumns(self):
         """
 
-        :rtype: list[Column]
+        :rtype: list of Column
         """
         columnsJson = self._requester.getColumns(self.widgetCommonId)
         columns = []

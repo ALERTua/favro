@@ -21,3 +21,6 @@ class User(object):
 
     def __hash__(self):
         return hash(self.userId)
+
+    def __str__(self):
+        return "%s %s" % (self.name or '', self.email or '')

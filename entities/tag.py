@@ -23,6 +23,9 @@ class Tag(object):
     def __hash__(self):
         return hash(self.tagId)
 
+    def __str__(self):
+        return self.name
+
     def update(self, name=None, color=None):
         """
 
