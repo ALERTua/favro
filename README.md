@@ -1,3 +1,4 @@
+**This repository is archived, as I am no longer a Favro user. Feel free to fork it, or contact me to transfer the ownership.**
 ```
 from favro import Favro
 fvr = Favro('favro_user@email', u'favro_user_API_token', u'favro_organization_id')
